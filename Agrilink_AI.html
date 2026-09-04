@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AgriLink AI – Cotton & Groundnut Market Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#2d7a2d;--green-light:#4caf50;--green-pale:#e8f5e9;
+  --brown:#6d4c41;--brown-light:#8d6e63;--brown-pale:#efebe9;
+  --yellow:#f9a825;--yellow-pale:#fff8e1;
+  --white:#fff;--bg:#f4f6f0;--card:#fff;
+  --text:#1b2a1b;--muted:#6b7c6b;--border:#d4e0d4;
+  --red:#e53935;--orange:#fb8c00;--blue:#1565c0;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+
+/* LAYOUT */
+#app{display:flex;min-height:100vh}
+#sidebar{width:240px;background:#1b3a1b;color:#c8e6c9;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}
+#sidebar.hidden{transform:translateX(-100%)}
+#main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;box-shadow:var(--shadow)}
+#content{flex:1;padding:24px}
+
+/* SIDEBAR */
+.sidebar-logo{padding:20px 18px 12px;border-bottom:1px solid #2d5a2d}
+.sidebar-logo h2{color:#a5d6a7;font-size:1.1rem;font-weight:700;line-height:1.3}
+.sidebar-logo span{font-size:.75rem;color:#81c784;display:block;margin-top:2px}
+.sidebar-profile{padding:14px 18px;border-bottom:1px solid #2d5a2d;display:flex;align-items:center;gap:10px}
+.profile-avatar{width:38px;height:38px;border-radius:50%;background:#4caf50;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:#fff;flex-shrink:0}
+.profile-info small{color:#81c784;display:block;font-size:.72rem}
+.profile-info strong{color:#c8e6c9;font-size:.85rem}
+.nav-section{padding:10px 0}
+.nav-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#558b2f;padding:6px 18px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;transition:background .2s;font-size:.88rem;color:#c8e6c9;border-left:3px solid transparent}
+.nav-item:hover{background:#2d5a2d;color:#e8f5e9}
+.nav-item.active{background:#2d5a2d;border-left-color:#a5d6a7;color:#fff}
+.nav-icon{font-size:1.1rem;width:20px;text-align:center}
+
+/* TOPBAR */
+.topbar-left{display:flex;align-items:center;gap:12px}
+.menu-btn{background:none;border:none;font-size:1.3rem;color:var(--text);padding:4px 8px;display:none}
+.page-title{font-size:1rem;font-weight:600;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.time-badge{background:var(--green-pale);color:var(--green);padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:600}
+.notif-btn{background:none;border:none;font-size:1.2rem;position:relative}
+.notif-dot{position:absolute;top:0;right:0;width:8px;height:8px;background:var(--red);border-radius:50%}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border-radius:14px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card-grid{display:grid;gap:16px}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+
+/* STAT CARDS */
+.stat-card{border-radius:14px;padding:18px 20px;color:#fff;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;background:rgba(255,255,255,.1);border-radius:50%}
+.stat-card .stat-label{font-size:.75rem;opacity:.85;text-transform:uppercase;letter-spacing:.05em}
+.stat-card .stat-value{font-size:1.6rem;font-weight:700;margin:4px 0}
+.stat-card .stat-change{font-size:.78rem;opacity:.9}
+.sc-green{background:linear-gradient(135deg,#2d7a2d,#4caf50)}
+.sc-brown{background:linear-gradient(135deg,#6d4c41,#8d6e63)}
+.sc-yellow{background:linear-gradient(135deg,#e65100,#f9a825)}
+.sc-blue{background:linear-gradient(135deg,#1565c0,#42a5f5)}
+.sc-teal{background:linear-gradient(135deg,#00695c,#26a69a)}
+.sc-purple{background:linear-gradient(135deg,#4527a0,#7e57c2)}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge-green{background:#c8e6c9;color:#1b5e20}
+.badge-red{background:#ffcdd2;color:#b71c1c}
+.badge-orange{background:#ffe0b2;color:#e65100}
+.badge-blue{background:#bbdefb;color:#0d47a1}
+.badge-yellow{background:#fff9c4;color:#f57f17}
+.badge-sell{background:#b71c1c;color:#fff}
+.badge-hold{background:#e65100;color:#fff}
+.badge-store{background:#1b5e20;color:#fff}
+
+/* SECTION HEADERS */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-header h2{font-size:1.05rem;font-weight:700;color:var(--text)}
+.section-header p{font-size:.8rem;color:var(--muted);margin-top:2px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:.85rem;font-weight:600;border:none;transition:all .2s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:#1b5e20}
+.btn-secondary{background:var(--white);color:var(--green);border:1.5px solid var(--green)}
+.btn-secondary:hover{background:var(--green-pale)}
+.btn-sm{padding:6px 12px;font-size:.78rem}
+.btn-danger{background:var(--red);color:#fff}
+.btn-orange{background:var(--orange);color:#fff}
+
+/* FORMS */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:5px}
+.form-control{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;font-family:inherit;background:#fff;color:var(--text);transition:border .2s}
+.form-control:focus{outline:none;border-color:var(--green-light)}
+select.form-control{cursor:pointer}
+
+/* TABLES */
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:var(--green-pale)}
+thead th{padding:10px 14px;font-weight:700;text-align:left;color:var(--green);border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid #f0f4f0}
+tbody tr:last-child{border:none}
+tbody tr:hover{background:#fafcfa}
+tbody td{padding:10px 14px;color:var(--text)}
+
+/* PROGRESS BAR */
+.progress-bar{height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--green-light)}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:9px 18px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1b3a1b 0%,#2d7a2d 60%,#4caf50 100%);color:#fff;border-radius:18px;padding:48px 40px;position:relative;overflow:hidden;margin-bottom:24px}
+.hero::before{content:'🌾';position:absolute;right:40px;top:20px;font-size:8rem;opacity:.15}
+.hero::after{content:'🌱';position:absolute;right:160px;bottom:10px;font-size:5rem;opacity:.1}
+.hero h1{font-size:2rem;font-weight:800;line-height:1.3;max-width:600px}
+.hero p{font-size:1rem;opacity:.9;margin:12px 0 24px;max-width:500px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-btn-primary{background:#fff;color:var(--green);padding:12px 28px;border-radius:10px;font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:transform .2s}
+.hero-btn-primary:hover{transform:translateY(-2px)}
+.hero-btn-secondary{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.7);padding:12px 28px;border-radius:10px;font-weight:600;font-size:.95rem;cursor:pointer;transition:all .2s}
+.hero-btn-secondary:hover{background:rgba(255,255,255,.1)}
+.hero-stats{display:flex;gap:32px;margin-top:32px;flex-wrap:wrap}
+.hero-stat{border-left:3px solid rgba(255,255,255,.4);padding-left:16px}
+.hero-stat strong{display:block;font-size:1.5rem;font-weight:800}
+.hero-stat span{font-size:.78rem;opacity:.8;text-transform:uppercase;letter-spacing:.05em}
+
+/* FEATURE CARDS */
+.feature-card{border-radius:14px;padding:22px;border:1.5px solid var(--border);background:#fff;transition:all .2s;cursor:pointer}
+.feature-card:hover{border-color:var(--green-light);box-shadow:0 4px 20px rgba(45,122,45,.15);transform:translateY(-2px)}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:14px}
+.feature-card h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.feature-card p{font-size:.8rem;color:var(--muted);line-height:1.5}
+
+/* AI RECOMMENDATION */
+.ai-card{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1.5px solid #a5d6a7;border-radius:14px;padding:18px 20px}
+.ai-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-card-header span{font-size:.78rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em}
+.ai-card-body{font-size:.88rem;color:var(--text);line-height:1.6}
+.ai-icon{font-size:1.2rem}
+
+/* BUYER CARDS */
+.buyer-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:18px;transition:all .2s}
+.buyer-card:hover{border-color:var(--green-light);box-shadow:var(--shadow)}
+.buyer-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.buyer-avatar{width:44px;height:44px;border-radius:50%;background:var(--brown-pale);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.buyer-name{font-weight:700;font-size:.95rem}
+.buyer-loc{font-size:.78rem;color:var(--muted)}
+.match-bar{background:#f0f4f0;border-radius:8px;height:6px;margin:6px 0 2px}
+.match-fill{height:100%;border-radius:8px;background:var(--green-light)}
+.match-label{font-size:.72rem;color:var(--muted)}
+
+/* CHATBOT */
+#chatbot{position:fixed;bottom:24px;right:24px;z-index:999}
+#chat-btn{width:56px;height:56px;border-radius:50%;background:var(--green);color:#fff;border:none;font-size:1.5rem;box-shadow:0 4px 20px rgba(45,122,45,.4);cursor:pointer;transition:transform .2s}
+#chat-btn:hover{transform:scale(1.08)}
+#chat-window{display:none;position:absolute;bottom:68px;right:0;width:320px;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.18);border:1px solid var(--border);flex-direction:column;overflow:hidden}
+#chat-window.open{display:flex}
+#chat-header{background:var(--green);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+#chat-header h4{font-size:.9rem;font-weight:700}
+#chat-header small{opacity:.8;font-size:.72rem}
+#chat-close{margin-left:auto;background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer}
+#chat-messages{flex:1;overflow-y:auto;padding:12px;max-height:280px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:8px 12px;border-radius:12px;font-size:.82rem;line-height:1.5}
+.msg-bot{background:var(--green-pale);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.msg-user{background:var(--green);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+#chat-footer{border-top:1px solid var(--border);padding:10px}
+#chat-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.82rem;font-family:inherit;margin-bottom:8px}
+#chat-input:focus{outline:none;border-color:var(--green-light)}
+.chat-quick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.chat-quick button{font-size:.7rem;padding:3px 8px;border-radius:10px;border:1px solid var(--border);background:#f9fafb;color:var(--muted);cursor:pointer}
+.chat-quick button:hover{border-color:var(--green-light);color:var(--green)}
+#chat-send{width:100%;background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px;font-size:.82rem;font-weight:600;cursor:pointer}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:18px;padding:28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
+
+/* MAP PLACEHOLDER */
+.map-card{background:linear-gradient(135deg,#e8f5e9,#dcedc8);border:1.5px solid #a5d6a7;border-radius:14px;padding:20px;position:relative;overflow:hidden}
+.mandi-pin{position:absolute;cursor:pointer;transform:translate(-50%,-50%);text-align:center;transition:transform .2s}
+.mandi-pin:hover{transform:translate(-50%,-50%) scale(1.2)}
+.mandi-pin .pin-icon{font-size:1.5rem;display:block}
+.mandi-pin .pin-label{font-size:.65rem;font-weight:700;color:#1b3a1b;white-space:nowrap;background:rgba(255,255,255,.85);border-radius:4px;padding:1px 4px;margin-top:2px}
+.map-bg{width:100%;height:320px;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="320"><defs><pattern id="g" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0L0 30M0 0L30 30" stroke="%23a5d6a7" stroke-width="0.5" fill="none"/></pattern></defs><rect width="600" height="320" fill="%23e8f5e9"/><rect width="600" height="320" fill="url(%23g)"/></svg>') center/cover;border-radius:10px;position:relative}
+
+/* LOADING SPINNER */
+.spinner{width:20px;height:20px;border:2px solid #e0e0e0;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* QUALITY UPLOAD */
+.upload-zone{border:2.5px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border .2s}
+.upload-zone:hover{border-color:var(--green-light);background:var(--green-pale)}
+.quality-param{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.quality-param span{width:130px;font-size:.82rem;color:var(--muted)}
+.quality-param .progress-bar{flex:1}
+.quality-param strong{width:36px;text-align:right;font-size:.82rem}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  .menu-btn{display:block}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .hero h1{font-size:1.4rem}
+}
+@media(max-width:540px){
+  .grid-4,.grid-3,.grid-2{grid-template-columns:1fr}
+  #content{padding:14px}
+  .hero{padding:28px 20px}
+  #chat-window{width:280px}
+}
+
+/* CHART CONTAINERS */
+.chart-wrap{position:relative;height:220px}
+.chart-wrap-sm{position:relative;height:160px}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h2>🌿 AgriLink AI</h2>
+    <span>Cotton & Groundnut Platform</span>
+  </div>
+  <div class="sidebar-profile">
+    <div class="profile-avatar">RP</div>
+    <div class="profile-info">
+      <strong>Ramesh Patel</strong>
+      <small>📍 Rajkot, Gujarat</small>
+      <small>Cotton · Groundnut Farmer</small>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="navigate('home')"><span class="nav-icon">🏠</span>Home</div>
+    <div class="nav-item" onclick="navigate('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="navigate('market')"><span class="nav-icon">💹</span>Market Prices</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">AI Agents</div>
+    <div class="nav-item" onclick="navigate('forecast')"><span class="nav-icon">🔮</span>Price Forecast</div>
+    <div class="nav-item" onclick="navigate('buyers')"><span class="nav-icon">🤝</span>Find Buyers</div>
+    <div class="nav-item" onclick="navigate('storage')"><span class="nav-icon">🏪</span>Storage Advisor</div>
+    <div class="nav-item" onclick="navigate('quality')"><span class="nav-icon">⭐</span>Quality Grading</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Finance</div>
+    <div class="nav-item" onclick="navigate('income')"><span class="nav-icon">💰</span>Income Dashboard</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Explore</div>
+    <div class="nav-item" onclick="navigate('map')"><span class="nav-icon">🗺️</span>Mandi Map</div>
+    <div class="nav-item" onclick="navigate('settings')"><span class="nav-icon">⚙️</span>Settings</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div>
+        <div class="page-title" id="topbar-title">Home</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="time-badge" id="live-time">🕐 Loading...</div>
+      <button class="notif-btn">🔔<span class="notif-dot"></span></button>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- ===== HOME PAGE ===== -->
+    <div id="page-home" class="page active">
+      <div class="hero">
+        <h1>Empowering Farmers with AI-Powered Market Intelligence</h1>
+        <p>Get real-time mandi prices, predict market trends, connect directly with buyers, and make smarter selling decisions.</p>
+        <div class="hero-btns">
+          <button class="hero-btn-primary" onclick="navigate('dashboard')">📊 Get Started</button>
+          <button class="hero-btn-secondary" onclick="navigate('market')">💹 View Market Prices</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>2,400+</strong><span>Farmers Connected</span></div>
+          <div class="hero-stat"><strong>₹7,250</strong><span>Cotton Today</span></div>
+          <div class="hero-stat"><strong>₹6,800</strong><span>Groundnut Today</span></div>
+          <div class="hero-stat"><strong>18</strong><span>Mandis Covered</span></div>
+        </div>
+      </div>
+
+      <div class="section-header"><div><h2>Our AI-Powered Agents</h2><p>Five intelligent tools working together for your benefit</p></div></div>
+      <div class="card-grid grid-3" style="margin-bottom:24px">
+        <div class="feature-card" onclick="navigate('forecast')">
+          <div class="feature-icon" style="background:#e8f5e9">🔮</div>
+          <h3>Mandi Price Forecasting</h3>
+          <p>AI predicts cotton & groundnut prices up to 7 days ahead with confidence scoring.</p>
+          <div style="margin-top:10px"><span class="badge badge-green">Active</span></div>
+        </div>
+        <div class="feature-card" onclick="navigate('buyers')">
+          <div class="feature-icon" style="background:#fff8e1">🤝</div>
+          <h3>Direct Buyer Matching</h3>
+          <p>Skip middlemen — connect directly with verified buyers who match your crop quality and quantity.</p>
+          <div style="margin-top:10px"><span class="badge badge-green">Active</span></div>
+        </div>
+        <div class="feature-card" onclick="navigate('storage')">
+          <div class="feature-icon" style="background:#efebe9">🏪</div>
+          <h3>Storage & Timing Advisor</h3>
+          <p>AI tells you the optimal time to sell or store, factoring in predicted prices and storage costs.</p>
+          <div style="margin-top:10px"><span class="badge badge-green">Active</span></div>
+        </div>
+        <div class="feature-card" onclick="navigate('quality')">
+          <div class="feature-icon" style="background:#e3f2fd">⭐</div>
+          <h3>Quality Grading Assistant</h3>
+          <p>Upload crop images for instant AI-powered quality grading and price recommendation.</p>
+          <div style="margin-top:10px"><span class="badge badge-green">Active</span></div>
+        </div>
+        <div class="feature-card" onclick="navigate('income')">
+          <div class="feature-icon" style="background:#f3e5f5">💰</div>
+          <h3>Income Dashboard</h3>
+          <p>Track earnings, transactions, and crop-wise income with beautiful analytics.</p>
+          <div style="margin-top:10px"><span class="badge badge-green">Active</span></div>
+        </div>
+        <div class="feature-card" onclick="navigate('map')">
+          <div class="feature-icon" style="background:#fce4ec">🗺️</div>
+          <h3>Mandi Map</h3>
+          <p>Interactive map of Gujarat mandis with live prices, distances and demand indicators.</p>
+          <div style="margin-top:10px"><span class="badge badge-green">Active</span></div>
+        </div>
+      </div>
+
+      <div class="card-grid grid-2">
+        <div class="card">
+          <div class="section-header"><div><h2>📰 Market Alerts</h2></div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="padding:12px;border-radius:10px;background:#e8f5e9;border-left:4px solid var(--green)">
+              <strong style="font-size:.85rem">🔺 Cotton prices rising in Rajkot</strong>
+              <p style="font-size:.78rem;color:var(--muted);margin-top:3px">Prices up ₹120/quintal from yesterday. AI predicts further 4% rise in 5 days.</p>
+            </div>
+            <div style="padding:12px;border-radius:10px;background:#fff8e1;border-left:4px solid var(--yellow)">
+              <strong style="font-size:.85rem">⚠️ Groundnut slight dip expected</strong>
+              <p style="font-size:.78rem;color:var(--muted);margin-top:3px">Prices may fall by 2.2% next week due to higher arrivals. Consider selling soon.</p>
+            </div>
+            <div style="padding:12px;border-radius:10px;background:#e3f2fd;border-left:4px solid #1565c0">
+              <strong style="font-size:.85rem">🆕 3 new verified buyers in Gondal</strong>
+              <p style="font-size:.78rem;color:var(--muted);margin-top:3px">New buyers looking for Grade A cotton. Best price offered: ₹7,400/quintal.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-header"><div><h2>📈 Quick Price Snapshot</h2></div></div>
+          <div class="chart-wrap"><canvas id="homeSnapshotChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="page-dashboard" class="page">
+      <div class="section-header"><div><h2>👨‍🌾 Farmer Dashboard</h2><p>Welcome back, Ramesh! Here's your market overview for today.</p></div>
+        <span class="badge badge-green">🟢 Live</span>
+      </div>
+      <div class="card-grid grid-4" style="margin-bottom:20px">
+        <div class="stat-card sc-green"><div class="stat-label">Today's Cotton</div><div class="stat-value">₹7,250</div><div class="stat-change">↑ +₹120 from yesterday</div></div>
+        <div class="stat-card sc-brown"><div class="stat-label">Today's Groundnut</div><div class="stat-value">₹6,800</div><div class="stat-change">↓ -₹50 from yesterday</div></div>
+        <div class="stat-card sc-yellow"><div class="stat-label">Best Nearby Mandi</div><div class="stat-value" style="font-size:1.2rem">Gondal</div><div class="stat-change">₹7,380 cotton · 12 km</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">AI Recommendation</div><div class="stat-value" style="font-size:1.1rem">HOLD</div><div class="stat-change">Store cotton 5–7 days</div></div>
+      </div>
+      <div class="card-grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="section-header"><div><h2>📉 7-Day Price Trend</h2></div>
+            <select class="form-control" style="width:140px" onchange="updateDashboardTrend(this.value)">
+              <option value="cotton">Cotton</option>
+              <option value="groundnut">Groundnut</option>
+            </select>
+          </div>
+          <div class="chart-wrap"><canvas id="dashTrendChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-header"><div><h2>🏪 Mandi Comparison</h2></div></div>
+          <div class="chart-wrap"><canvas id="mandiCompareChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="section-header"><div><h2>🔮 7-Day Price Prediction</h2></div><span class="badge badge-blue">AI Forecast</span></div>
+          <div class="chart-wrap"><canvas id="dashForecastChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-header"><div><h2>📋 Crop Overview</h2></div></div>
+          <table>
+            <thead><tr><th>Crop</th><th>Current Price</th><th>Predicted</th><th>Trend</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>🌿 Cotton</td><td>₹7,250/q</td><td>₹7,550/q</td><td><span style="color:var(--green)">↑ +4.1%</span></td><td><span class="badge badge-store">STORE</span></td></tr>
+              <tr><td>🥜 Groundnut</td><td>₹6,800/q</td><td>₹6,650/q</td><td><span style="color:var(--red)">↓ -2.2%</span></td><td><span class="badge badge-sell">SELL NOW</span></td></tr>
+            </tbody>
+          </table>
+          <div class="ai-card" style="margin-top:16px">
+            <div class="ai-card-header"><span class="ai-icon">🤖</span><span>AI Insight</span></div>
+            <div class="ai-card-body">Cotton prices are on an upward trend. Storing for 5–7 more days could yield an extra <strong>₹3,400</strong> on 10 quintals. Groundnut prices are slightly declining — selling today is recommended.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MARKET PRICES ===== -->
+    <div id="page-market" class="page">
+      <div class="section-header"><div><h2>💹 Live Market Prices</h2><p>Real-time mandi prices across Gujarat</p></div>
+        <div style="display:flex;gap:8px">
+          <input class="form-control" style="width:180px" placeholder="🔍 Search mandi..." oninput="filterMarket(this.value)"/>
+          <select class="form-control" style="width:130px" onchange="filterByCrop(this.value)">
+            <option value="all">All Crops</option>
+            <option value="cotton">Cotton</option>
+            <option value="groundnut">Groundnut</option>
+          </select>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="table-wrap">
+          <table id="market-table">
+            <thead><tr><th>Mandi</th><th>District</th><th>Cotton (₹/q)</th><th>Groundnut (₹/q)</th><th>Arrivals</th><th>Trend</th><th>Last Updated</th></tr></thead>
+            <tbody id="market-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-grid grid-2">
+        <div class="card">
+          <div class="section-header"><div><h2>🏆 Top Cotton Mandis</h2></div></div>
+          <div class="chart-wrap"><canvas id="topCottonChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-header"><div><h2>🏆 Top Groundnut Mandis</h2></div></div>
+          <div class="chart-wrap"><canvas id="topGroundnutChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PRICE FORECAST ===== -->
+    <div id="page-forecast" class="page">
+      <div class="section-header"><div><h2>🔮 Mandi Price Forecasting Agent</h2><p>AI-powered price predictions with confidence scoring</p></div></div>
+      <div class="card-grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:.95rem">⚙️ Configure Forecast</h3>
+          <div class="form-group">
+            <label>Crop</label>
+            <select class="form-control" id="fc-crop" onchange="updateForecast()">
+              <option value="cotton">Cotton</option>
+              <option value="groundnut">Groundnut</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mandi Location</label>
+            <select class="form-control" id="fc-mandi" onchange="updateForecast()">
+              <option>Rajkot</option><option>Gondal</option><option>Junagadh</option>
+              <option>Amreli</option><option>Ahmedabad</option><option>Bhavnagar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Forecast Period</label>
+            <select class="form-control" id="fc-days" onchange="updateForecast()">
+              <option value="7">Next 7 Days</option>
+              <option value="14">Next 14 Days</option>
+              <option value="30">Next 30 Days</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="runForecast()">🔮 Run AI Forecast</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:.95rem">📊 Current Market Stats</h3>
+          <div class="card-grid grid-2">
+            <div style="padding:12px;background:var(--green-pale);border-radius:10px">
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase">Current Price</div>
+              <div style="font-size:1.4rem;font-weight:800;color:var(--green)" id="fc-current">₹7,250</div>
+            </div>
+            <div style="padding:12px;background:var(--brown-pale);border-radius:10px">
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase">Yesterday</div>
+              <div style="font-size:1.4rem;font-weight:800;color:var(--brown)" id="fc-yesterday">₹7,130</div>
+            </div>
+            <div style="padding:12px;background:var(--yellow-pale);border-radius:10px">
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase">Weekly Trend</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--yellow)" id="fc-weekly">↑ +3.4%</div>
+            </div>
+            <div style="padding:12px;background:#e3f2fd;border-radius:10px">
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase">Monthly Trend</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--blue)" id="fc-monthly">↑ +7.1%</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:#f3e5f5;border-radius:10px">
+            <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase">AI Predicted Price (7 days)</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.5rem;font-weight:800;color:#7b1fa2" id="fc-predicted">₹7,550</span>
+              <div>
+                <div style="font-size:.78rem;color:var(--muted)">Confidence</div>
+                <div class="progress-bar" style="width:120px"><div class="progress-fill" id="fc-confidence-bar" style="width:84%;background:#7b1fa2"></div></div>
+                <div style="font-size:.72rem;color:#7b1fa2;margin-top:2px" id="fc-confidence-txt">84% Confidence</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-header"><div><h2>📈 Price Forecast Chart</h2></div><span class="badge badge-blue">AI Model v2.4</span></div>
+        <div class="chart-wrap" style="height:260px"><canvas id="forecastChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ai-card">
+          <div class="ai-card-header"><span class="ai-icon">🤖</span><span>AI Recommendation</span><div style="margin-left:auto" id="fc-action-badge"><span class="badge badge-store">STORE</span></div></div>
+          <div class="ai-card-body" id="fc-recommendation">
+            Cotton prices are expected to increase by approximately <strong>4.1%</strong> in the next 5 days. Consider storing your crop if storage facilities are available. The upward trend is driven by lower arrivals at major Gujarat mandis and strong export demand.
+          </div>
+        </div>
+        <div class="card-grid grid-3" style="margin-top:16px">
+          <div style="text-align:center;padding:14px;border-radius:10px;background:#ffebee;cursor:pointer" onclick="selectAction('sell')">
+            <div style="font-size:1.5rem">💸</div>
+            <div style="font-weight:700;color:var(--red);margin-top:4px">SELL NOW</div>
+            <div style="font-size:.75rem;color:var(--muted)">Take current market rate</div>
+          </div>
+          <div style="text-align:center;padding:14px;border-radius:10px;background:#fff8e1;cursor:pointer" onclick="selectAction('hold')">
+            <div style="font-size:1.5rem">⏳</div>
+            <div style="font-weight:700;color:var(--orange);margin-top:4px">HOLD</div>
+            <div style="font-size:.75rem;color:var(--muted)">Wait 2–3 days, monitor</div>
+          </div>
+          <div style="text-align:center;padding:14px;border-radius:10px;background:#e8f5e9;border:2px solid var(--green);cursor:pointer" id="action-store" onclick="selectAction('store')">
+            <div style="font-size:1.5rem">🏪</div>
+            <div style="font-weight:700;color:var(--green);margin-top:4px">STORE</div>
+            <div style="font-size:.75rem;color:var(--muted)">Best returns in 5–7 days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BUYERS ===== -->
+    <div id="page-buyers" class="page">
+      <div class="section-header"><div><h2>🤝 Direct Buyer-Farmer Matching</h2><p>Connect with verified buyers — no middlemen</p></div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-list-crop')">➕ List My Crop</button>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('buyers','tab-browse')">Browse Buyers</div>
+        <div class="tab" onclick="switchTab('buyers','tab-mylistings')">My Listings</div>
+        <div class="tab" onclick="switchTab('buyers','tab-offers')">Received Offers</div>
+      </div>
+      <div id="tab-browse" class="tab-panel active">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <input class="form-control" style="flex:1;min-width:160px" placeholder="🔍 Search buyers..." id="buyer-search" oninput="filterBuyers()"/>
+          <select class="form-control" style="width:140px" id="buyer-crop-filter" onchange="filterBuyers()">
+            <option value="all">All Crops</option>
+            <option value="cotton">Cotton</option>
+            <option value="groundnut">Groundnut</option>
+          </select>
+          <select class="form-control" style="width:140px" id="buyer-sort" onchange="filterBuyers()">
+            <option value="match">Best Match</option>
+            <option value="price">Highest Price</option>
+            <option value="distance">Nearest</option>
+          </select>
+        </div>
+        <div class="card-grid grid-3" id="buyers-grid"></div>
+      </div>
+      <div id="tab-mylistings" class="tab-panel">
+        <div class="card">
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:16px">Your active crop listings visible to buyers:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Crop</th><th>Quantity</th><th>Grade</th><th>Expected Price</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td>🌿 Cotton</td><td>50 Quintal</td><td><span class="badge badge-green">Grade A</span></td><td>₹7,300/q</td><td>Rajkot</td><td><span class="badge badge-blue">Active</span></td><td><button class="btn btn-sm btn-secondary">Edit</button></td></tr>
+                <tr><td>🥜 Groundnut</td><td>30 Quintal</td><td><span class="badge badge-yellow">Grade B</span></td><td>₹6,700/q</td><td>Rajkot</td><td><span class="badge badge-blue">Active</span></td><td><button class="btn btn-sm btn-secondary">Edit</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="tab-offers" class="tab-panel">
+        <div class="card">
+          <div class="card-grid grid-1" style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:14px;border-radius:10px;border:1.5px solid #a5d6a7;background:#f1f8e9">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                <div><strong>Patel Agro Traders</strong> · Gondal <span class="badge badge-green" style="margin-left:6px">✓ Verified</span></div>
+                <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Accept</button><button class="btn btn-secondary btn-sm">Decline</button></div>
+              </div>
+              <div style="margin-top:8px;font-size:.85rem;color:var(--muted)">Crop: Cotton · 50 Quintal · Offered: <strong style="color:var(--green)">₹7,400/q</strong> · Total: <strong>₹3,70,000</strong></div>
+            </div>
+            <div style="padding:14px;border-radius:10px;border:1.5px solid #ffe082;background:#fffde7">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                <div><strong>Gujarat Cotton Corp</strong> · Ahmedabad <span class="badge badge-green" style="margin-left:6px">✓ Verified</span></div>
+                <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Accept</button><button class="btn btn-secondary btn-sm">Decline</button></div>
+              </div>
+              <div style="margin-top:8px;font-size:.85rem;color:var(--muted)">Crop: Cotton · 30 Quintal · Offered: <strong style="color:var(--orange)">₹7,200/q</strong> · Total: <strong>₹2,16,000</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STORAGE ADVISOR ===== -->
+    <div id="page-storage" class="page">
+      <div class="section-header"><div><h2>🏪 Storage & Selling Timing Advisor</h2><p>AI-powered decision support for sell vs. store</p></div></div>
+      <div class="card-grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:.95rem">📝 Enter Crop Details</h3>
+          <div class="form-group">
+            <label>Crop Type</label>
+            <select class="form-control" id="st-crop">
+              <option>Cotton</option><option>Groundnut</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantity (Quintal)</label>
+            <input class="form-control" type="number" id="st-qty" value="50" min="1"/>
+          </div>
+          <div class="form-group">
+            <label>Current Market Price (₹/quintal)</label>
+            <input class="form-control" type="number" id="st-price" value="7250" min="1"/>
+          </div>
+          <div class="form-group">
+            <label>Available Storage Duration (Days)</label>
+            <select class="form-control" id="st-days">
+              <option value="7">7 Days</option><option value="14">14 Days</option>
+              <option value="21">21 Days</option><option value="30">30 Days</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Storage Cost (₹/quintal/day)</label>
+            <input class="form-control" type="number" id="st-cost" value="8" min="0"/>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="runStorageAdvisor()">🤖 Get AI Recommendation</button>
+        </div>
+        <div class="card" id="storage-result">
+          <div style="text-align:center;padding:40px 20px;color:var(--muted)">
+            <div style="font-size:3rem;margin-bottom:12px">🤖</div>
+            <p>Fill in the details and click <strong>Get AI Recommendation</strong> to see your personalised storage advice.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-header"><div><h2>📊 Profit Comparison Chart</h2></div></div>
+        <div class="chart-wrap"><canvas id="storageChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ===== QUALITY GRADING ===== -->
+    <div id="page-quality" class="page">
+      <div class="section-header"><div><h2>⭐ Quality Grading Assistance Agent</h2><p>AI-powered crop quality assessment and pricing</p></div></div>
+      <div class="card-grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:.95rem">📸 Upload Crop Sample</h3>
+          <div class="upload-zone" onclick="document.getElementById('crop-image').click()">
+            <div style="font-size:2.5rem">📷</div>
+            <p style="font-weight:600;margin:8px 0 4px">Click to upload crop image</p>
+            <p style="font-size:.78rem;color:var(--muted)">PNG, JPG up to 10MB</p>
+            <input type="file" id="crop-image" style="display:none" accept="image/*" onchange="handleImageUpload(this)"/>
+          </div>
+          <div id="uploaded-preview" style="display:none;margin-top:12px;text-align:center">
+            <img id="preview-img" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:cover"/>
+          </div>
+          <div class="form-group" style="margin-top:16px">
+            <label>Crop Type</label>
+            <select class="form-control" id="qg-crop"><option>Cotton</option><option>Groundnut</option></select>
+          </div>
+          <div class="form-group">
+            <label>Moisture Level (%)</label>
+            <input class="form-control" type="number" id="qg-moisture" value="8" min="0" max="100"/>
+          </div>
+          <div class="form-group">
+            <label>Harvest Date</label>
+            <input class="form-control" type="date" id="qg-date"/>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runQualityGrade()">⭐ Analyze Quality</button>
+        </div>
+        <div class="card" id="quality-result">
+          <div style="text-align:center;padding:40px 20px;color:var(--muted)">
+            <div style="font-size:3rem;margin-bottom:12px">🔬</div>
+            <p>Upload a crop image or enter details and click <strong>Analyze Quality</strong> for instant AI grading.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INCOME DASHBOARD ===== -->
+    <div id="page-income" class="page">
+      <div class="section-header"><div><h2>💰 Farmer Income Dashboard</h2><p>Track your earnings and financial performance</p></div>
+        <select class="form-control" style="width:140px" onchange="updateIncomeCharts(this.value)">
+          <option value="2024">2024</option><option value="2023">2023</option>
+        </select>
+      </div>
+      <div class="card-grid grid-4" style="margin-bottom:20px">
+        <div class="stat-card sc-green"><div class="stat-label">Total Earnings</div><div class="stat-value">₹8.4L</div><div class="stat-change">↑ +12% vs last year</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Monthly Income</div><div class="stat-value">₹70K</div><div class="stat-change">↑ +8% vs last month</div></div>
+        <div class="stat-card sc-teal"><div class="stat-label">Total Crop Sold</div><div class="stat-value">120 Q</div><div class="stat-change">Cotton 70q + GN 50q</div></div>
+        <div class="stat-card sc-purple"><div class="stat-label">Pending Payments</div><div class="stat-value">₹42,000</div><div class="stat-change">2 transactions pending</div></div>
+      </div>
+      <div class="card-grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="section-header"><div><h2>📅 Monthly Income</h2></div></div>
+          <div class="chart-wrap"><canvas id="monthlyIncomeChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-header"><div><h2>🌾 Crop-wise Distribution</h2></div></div>
+          <div class="chart-wrap"><canvas id="cropIncomeChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-header">
+          <div><h2>📋 Transaction History</h2></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="form-control" style="width:130px" id="txn-crop-filter" onchange="filterTransactions()"><option value="all">All Crops</option><option value="cotton">Cotton</option><option value="groundnut">Groundnut</option></select>
+            <select class="form-control" style="width:130px" id="txn-status-filter" onchange="filterTransactions()"><option value="all">All Status</option><option value="paid">Paid</option><option value="pending">Pending</option></select>
+            <input class="form-control" style="width:140px" type="date" id="txn-date-filter" onchange="filterTransactions()"/>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Crop</th><th>Quantity</th><th>Buyer</th><th>Rate</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody id="txn-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MANDI MAP ===== -->
+    <div id="page-map" class="page">
+      <div class="section-header"><div><h2>🗺️ Gujarat Mandi Map</h2><p>Agricultural markets with live prices and demand</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-secondary" onclick="filterMap('all')" id="map-btn-all">All</button>
+          <button class="btn btn-sm btn-secondary" onclick="filterMap('cotton')" id="map-btn-cotton">🌿 Cotton</button>
+          <button class="btn btn-sm btn-secondary" onclick="filterMap('groundnut')" id="map-btn-groundnut">🥜 Groundnut</button>
+          <button class="btn btn-sm btn-secondary" onclick="filterMap('highest')" id="map-btn-highest">💰 Highest Price</button>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="map-bg" id="gujarat-map">
+          <!-- Mandi pins will be injected by JS -->
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px;font-size:.75rem;color:var(--muted);flex-wrap:wrap">
+          <span>🟢 High Demand</span><span>🟡 Medium Demand</span><span>🔴 Low Demand</span>
+          <span style="margin-left:auto">📍 Click any mandi for details</span>
+        </div>
+      </div>
+      <div class="card-grid grid-3" id="mandi-cards-grid"></div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div id="page-settings" class="page">
+      <div class="section-header"><div><h2>⚙️ Settings</h2><p>Manage your profile and preferences</p></div></div>
+      <div class="card-grid grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:.95rem">👤 Farmer Profile</h3>
+          <div class="form-group"><label>Full Name</label><input class="form-control" value="Ramesh Patel"/></div>
+          <div class="form-group"><label>Mobile Number</label><input class="form-control" value="+91 98765 43210"/></div>
+          <div class="form-group"><label>Village / Taluka</label><input class="form-control" value="Rajkot, Gujarat"/></div>
+          <div class="form-group"><label>Primary Crop</label>
+            <select class="form-control"><option>Cotton</option><option>Groundnut</option><option>Both</option></select>
+          </div>
+          <div class="form-group"><label>Land Area (Acres)</label><input class="form-control" type="number" value="12"/></div>
+          <button class="btn btn-primary">💾 Save Profile</button>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:.95rem">🔔 Notification Preferences</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg);border-radius:8px">
+              <div><strong style="font-size:.88rem">Price Alerts</strong><p style="font-size:.75rem;color:var(--muted)">Notify when price changes by 3%+</p></div>
+              <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--green)"/>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg);border-radius:8px">
+              <div><strong style="font-size:.88rem">New Buyer Matches</strong><p style="font-size:.75rem;color:var(--muted)">Alert when new buyers match your crop</p></div>
+              <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--green)"/>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg);border-radius:8px">
+              <div><strong style="font-size:.88rem">AI Recommendations</strong><p style="font-size:.75rem;color:var(--muted)">Daily sell/store recommendations</p></div>
+              <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--green)"/>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg);border-radius:8px">
+              <div><strong style="font-size:.88rem">Payment Updates</strong><p style="font-size:.75rem;color:var(--muted)">Notify on transaction status changes</p></div>
+              <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--green)"/>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:16px">💾 Save Preferences</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-list-crop">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-list-crop')">✕</button>
+    <h3 style="margin-bottom:16px">➕ List Your Crop</h3>
+    <div class="form-group"><label>Crop Name</label><select class="form-control"><option>Cotton</option><option>Groundnut</option></select></div>
+    <div class="form-group"><label>Quantity (Quintal)</label><input class="form-control" type="number" placeholder="e.g. 50"/></div>
+    <div class="form-group"><label>Quality Grade</label><select class="form-control"><option>Grade A</option><option>Grade B</option><option>Grade C</option></select></div>
+    <div class="form-group"><label>Expected Price (₹/quintal)</label><input class="form-control" type="number" placeholder="e.g. 7300"/></div>
+    <div class="form-group"><label>Location</label><input class="form-control" placeholder="Village / Taluka"/></div>
+    <div class="form-group"><label>Additional Notes</label><textarea class="form-control" rows="2" placeholder="Any special quality notes..."></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" style="flex:1" onclick="submitListing()">📋 Submit Listing</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-list-crop')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-buyer-detail">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-buyer-detail')">✕</button>
+    <div id="modal-buyer-content"></div>
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<div id="chatbot">
+  <div id="chat-window">
+    <div id="chat-header">
+      <span style="font-size:1.2rem">🤖</span>
+      <div><h4>AgriLink AI Assistant</h4><small>Ask me about prices, buyers & more</small></div>
+      <button id="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div id="chat-messages">
+      <div class="msg msg-bot">👋 Hello Ramesh! I'm your AgriLink AI assistant. Ask me about cotton & groundnut prices, buyers, or when to sell your crop!</div>
+    </div>
+    <div id="chat-footer">
+      <div class="chat-quick">
+        <button onclick="quickChat('Cotton price today?')">Cotton price?</button>
+        <button onclick="quickChat('Should I sell groundnut today?')">Sell now?</button>
+        <button onclick="quickChat('Best mandi near Rajkot?')">Best mandi?</button>
+        <button onclick="quickChat('Next week cotton forecast?')">Forecast?</button>
+      </div>
+      <input id="chat-input" placeholder="Ask anything about crops, prices, buyers..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button id="chat-send" onclick="sendChat()">Send →</button>
+    </div>
+  </div>
+  <button id="chat-btn" onclick="toggleChat()">🤖</button>
+</div>
+
+<script>
+// ============ DATA ============
+const mandiData = [
+  {name:'Gondal',    district:'Rajkot',    cotton:7380, groundnut:6920, arrivals:'High',  trend:'↑', demand:'high',  lat:22.0,  lng:70.8},
+  {name:'Rajkot',    district:'Rajkot',    cotton:7250, groundnut:6800, arrivals:'Medium',trend:'↑', demand:'high',  lat:22.3,  lng:70.8},
+  {name:'Junagadh',  district:'Junagadh',  cotton:7190, groundnut:6870, arrivals:'Medium',trend:'→', demand:'medium',lat:21.5,  lng:70.5},
+  {name:'Amreli',    district:'Amreli',    cotton:7160, groundnut:6950, arrivals:'Low',   trend:'↑', demand:'high',  lat:21.6,  lng:71.2},
+  {name:'Ahmedabad', district:'Ahmedabad', cotton:7320, groundnut:6780, arrivals:'High',  trend:'↑', demand:'medium',lat:23.0,  lng:72.6},
+  {name:'Bhavnagar', district:'Bhavnagar', cotton:7140, groundnut:6830, arrivals:'Medium',trend:'↓', demand:'medium',lat:21.8,  lng:72.2},
+  {name:'Surendranagar',district:'Surendranagar',cotton:7200,groundnut:6760,arrivals:'High',trend:'↑',demand:'medium',lat:22.7,lng:71.6},
+  {name:'Morbi',     district:'Morbi',     cotton:7280, groundnut:6840, arrivals:'Low',   trend:'→', demand:'low',   lat:22.8,  lng:70.8},
+  {name:'Botad',     district:'Botad',     cotton:7310, groundnut:6900, arrivals:'Medium',trend:'↑', demand:'high',  lat:22.2,  lng:71.7},
+];
+
+const buyers = [
+  {id:1,name:'Patel Agro Traders',avatar:'🏢',location:'Gondal',dist:12,crop:'cotton',qty:200,price:7400,match:92,verified:true,grade:'A'},
+  {id:2,name:'Gujarat Cotton Corp',avatar:'🏭',location:'Ahmedabad',dist:85,crop:'cotton',qty:500,price:7200,match:78,verified:true,grade:'A/B'},
+  {id:3,name:'Saurashtra Seeds Co.',avatar:'🌿',location:'Rajkot',dist:5,crop:'groundnut',qty:100,price:6900,match:88,verified:true,grade:'A'},
+  {id:4,name:'Kisan Agro Hub',avatar:'🚜',location:'Junagadh',dist:60,crop:'groundnut',qty:80,price:6950,match:85,verified:false,grade:'A'},
+  {id:5,name:'Modi Traders',avatar:'💼',location:'Amreli',dist:45,crop:'cotton',qty:150,price:7350,match:81,verified:true,grade:'B'},
+  {id:6,name:'Sunrise Exports',avatar:'🌅',location:'Bhavnagar',dist:95,crop:'cotton',qty:1000,price:7180,match:70,verified:true,grade:'A'},
+  {id:7,name:'Reliable Agro Pvt Ltd',avatar:'✅',location:'Botad',dist:55,crop:'groundnut',qty:200,price:6850,match:74,verified:true,grade:'B'},
+  {id:8,name:'Farmer Direct Network',avatar:'👨‍🌾',location:'Gondal',dist:12,crop:'both',qty:300,price:7300,match:90,verified:true,grade:'A'},
+];
+
+const transactions = [
+  {date:'2024-11-15',crop:'Cotton',qty:20,buyer:'Patel Agro Traders',rate:7250,amount:145000,status:'paid'},
+  {date:'2024-11-02',crop:'Groundnut',qty:15,buyer:'Saurashtra Seeds Co.',rate:6800,amount:102000,status:'paid'},
+  {date:'2024-10-18',crop:'Cotton',qty:25,buyer:'Gujarat Cotton Corp',rate:7100,amount:177500,status:'paid'},
+  {date:'2024-10-05',crop:'Groundnut',qty:20,buyer:'Kisan Agro Hub',rate:6750,amount:135000,status:'paid'},
+  {date:'2024-09-22',crop:'Cotton',qty:10,buyer:'Modi Traders',rate:6950,amount:69500,status:'paid'},
+  {date:'2024-12-01',crop:'Cotton',qty:30,buyer:'Patel Agro Traders',rate:7400,amount:222000,status:'pending'},
+  {date:'2024-12-05',crop:'Groundnut',qty:10,buyer:'Farmer Direct Network',rate:6900,amount:69000,status:'pending'},
+];
+
+// ============ NAVIGATION ============
+const pageNames = {home:'Home',dashboard:'Dashboard',market:'Market Prices',forecast:'Price Forecast',buyers:'Find Buyers',storage:'Storage Advisor',quality:'Quality Grading',income:'Income Dashboard',map:'Mandi Map',settings:'Settings'};
+let currentPage = 'home';
+let chartsInit = {};
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => { if(n.textContent.trim() === pageNames[page]) n.classList.add('active'); });
+  document.getElementById('topbar-title').textContent = pageNames[page] || page;
+  currentPage = page;
+  if(window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+  // Init charts lazily
+  setTimeout(() => initPageCharts(page), 50);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('open');
+  sb.classList.toggle('hidden');
+}
+
+// ============ LIVE TIME ============
+function updateTime() {
+  const now = new Date();
+  document.getElementById('live-time').textContent = '🕐 ' + now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) + ' IST';
+}
+setInterval(updateTime, 1000); updateTime();
+
+// ============ TABS ============
+function switchTab(page, tabId) {
+  document.querySelectorAll('#page-' + page + ' .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#page-' + page + ' .tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  // find matching tab button
+  const panels = document.querySelectorAll('#page-' + page + ' .tab-panel');
+  const panelIds = Array.from(panels).map(p => p.id);
+  const idx = panelIds.indexOf(tabId);
+  const tabs = document.querySelectorAll('#page-' + page + ' .tab');
+  if(tabs[idx]) tabs[idx].classList.add('active');
+}
+
+// ============ MODALS ============
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function submitListing() { closeModal('modal-list-crop'); showToast('✅ Listing submitted! Buyers will contact you soon.'); }
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {position:'fixed',bottom:'90px',left:'50%',transform:'translateX(-50%)',background:'#1b3a1b',color:'#fff',padding:'12px 20px',borderRadius:'10px',fontSize:'.85rem',zIndex:9999,boxShadow:'0 4px 20px rgba(0,0,0,.3)',whiteSpace:'nowrap'});
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ============ MARKET TABLE ============
+function renderMarketTable(data) {
+  const tbody = document.getElementById('market-tbody');
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td><strong>${m.name}</strong></td>
+      <td>${m.district}</td>
+      <td>₹${m.cotton.toLocaleString('en-IN')}</td>
+      <td>₹${m.groundnut.toLocaleString('en-IN')}</td>
+      <td><span class="badge ${m.arrivals==='High'?'badge-green':m.arrivals==='Low'?'badge-orange':'badge-blue'}">${m.arrivals}</span></td>
+      <td style="color:${m.trend==='↑'?'var(--green)':m.trend==='↓'?'var(--red)':'var(--muted)'};font-weight:700">${m.trend}</td>
+      <td style="color:var(--muted);font-size:.8rem">${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} IST</td>
+    </tr>`).join('');
+}
+let marketFilter = '';
+let cropFilter = 'all';
+function filterMarket(val) { marketFilter = val.toLowerCase(); applyMarketFilter(); }
+function filterByCrop(val) { cropFilter = val; applyMarketFilter(); }
+function applyMarketFilter() {
+  let d = mandiData.filter(m => m.name.toLowerCase().includes(marketFilter) || m.district.toLowerCase().includes(marketFilter));
+  if(cropFilter !== 'all') d = d.filter(() => true); // both crops shown, just highlight
+  renderMarketTable(d);
+}
+
+// ============ BUYERS ============
+function renderBuyers(data) {
+  const grid = document.getElementById('buyers-grid');
+  grid.innerHTML = data.map(b => `
+    <div class="buyer-card">
+      <div class="buyer-header">
+        <div class="buyer-avatar">${b.avatar}</div>
+        <div>
+          <div class="buyer-name">${b.name} ${b.verified?'<span class="badge badge-green" style="font-size:.65rem">✓ Verified</span>':''}</div>
+          <div class="buyer-loc">📍 ${b.location} · ${b.dist} km away</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:10px">
+        <div><span style="color:var(--muted)">Crop:</span> <strong>${b.crop==='both'?'Cotton & GN':b.crop.charAt(0).toUpperCase()+b.crop.slice(1)}</strong></div>
+        <div><span style="color:var(--muted)">Qty:</span> <strong>${b.qty} Q</strong></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:12px">
+        <div><span style="color:var(--muted)">Offered:</span> <strong style="color:var(--green)">₹${b.price.toLocaleString('en-IN')}/q</strong></div>
+        <div><span style="color:var(--muted)">Grade:</span> <strong>${b.grade}</strong></div>
+      </div>
+      <div>
+        <div class="match-label">AI Match Score</div>
+        <div class="match-bar"><div class="match-fill" style="width:${b.match}%;background:${b.match>=85?'var(--green-light)':b.match>=70?'var(--yellow)':'var(--orange)'}"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:2px">
+          <span class="match-label">${b.match}% Match</span>
+          <span class="match-label">${b.match>=85?'Excellent':b.match>=70?'Good':'Fair'}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px">
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="viewBuyer(${b.id})">View Details</button>
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="contactBuyer(${b.id})">Contact</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterBuyers() {
+  let d = [...buyers];
+  const search = document.getElementById('buyer-search').value.toLowerCase();
+  const crop = document.getElementById('buyer-crop-filter').value;
+  const sort = document.getElementById('buyer-sort').value;
+  if(search) d = d.filter(b => b.name.toLowerCase().includes(search) || b.location.toLowerCase().includes(search));
+  if(crop !== 'all') d = d.filter(b => b.crop === crop || b.crop === 'both');
+  if(sort === 'match') d.sort((a,b) => b.match - a.match);
+  else if(sort === 'price') d.sort((a,b) => b.price - a.price);
+  else if(sort === 'distance') d.sort((a,b) => a.dist - b.dist);
+  renderBuyers(d);
+}
+
+function viewBuyer(id) {
+  const b = buyers.find(x => x.id === id);
+  document.getElementById('modal-buyer-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:3rem">${b.avatar}</div>
+      <h3 style="margin:8px 0 4px">${b.name} ${b.verified?'<span class="badge badge-green">✓ Verified</span>':''}</h3>
+      <p style="color:var(--muted);font-size:.85rem">📍 ${b.location} · ${b.dist} km from your farm</p>
+    </div>
+    <div class="card-grid grid-2" style="margin-bottom:16px">
+      <div style="padding:10px;background:var(--green-pale);border-radius:8px"><div style="font-size:.72rem;color:var(--muted)">CROPS NEEDED</div><strong>${b.crop === 'both' ? 'Cotton & Groundnut' : b.crop.charAt(0).toUpperCase()+b.crop.slice(1)}</strong></div>
+      <div style="padding:10px;background:var(--yellow-pale);border-radius:8px"><div style="font-size:.72rem;color:var(--muted)">QUANTITY REQUIRED</div><strong>${b.qty} Quintal</strong></div>
+      <div style="padding:10px;background:#e8f5e9;border-radius:8px"><div style="font-size:.72rem;color:var(--muted)">OFFERED PRICE</div><strong style="color:var(--green)">₹${b.price.toLocaleString('en-IN')}/quintal</strong></div>
+      <div style="padding:10px;background:#e3f2fd;border-radius:8px"><div style="font-size:.72rem;color:var(--muted)">PREFERRED GRADE</div><strong>Grade ${b.grade}</strong></div>
+    </div>
+    <div class="ai-card" style="margin-bottom:16px">
+      <div class="ai-card-header"><span class="ai-icon">🤖</span><span>AI Match Analysis</span></div>
+      <div class="ai-card-body">This buyer is a <strong>${b.match}% match</strong> for your crop. Price is ${b.price >= 7250 ? 'above' : 'slightly below'} today's market rate. Distance of ${b.dist} km makes logistics ${b.dist < 30 ? 'very convenient' : 'manageable'}.</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" style="flex:1" onclick="contactBuyer(${b.id});closeModal('modal-buyer-detail')">📞 Contact Buyer</button>
+      <button class="btn btn-secondary" style="flex:1" onclick="sendOffer(${b.id});closeModal('modal-buyer-detail')">📨 Send Offer</button>
+    </div>`;
+  openModal('modal-buyer-detail');
+}
+
+function contactBuyer(id) { showToast('📞 Contact request sent! Buyer will respond within 2 hours.'); }
+function sendOffer(id) { showToast('📨 Offer sent to buyer! Check "Received Offers" tab for updates.'); }
+
+// ============ STORAGE ADVISOR ============
+function runStorageAdvisor() {
+  const crop = document.getElementById('st-crop').value;
+  const qty = parseFloat(document.getElementById('st-qty').value) || 50;
+  const price = parseFloat(document.getElementById('st-price').value) || 7250;
+  const days = parseInt(document.getElementById('st-days').value) || 7;
+  const cost = parseFloat(document.getElementById('st-cost').value) || 8;
+
+  const isCotton = crop === 'Cotton';
+  const priceChange = isCotton ? 0.041 : -0.022;
+  const futurePrice = price * (1 + priceChange);
+  const storageCost = qty * days * cost;
+  const currentProfit = qty * price;
+  const futureProfit = qty * futurePrice - storageCost;
+  const netGain = futureProfit - currentProfit;
+  const recommend = netGain > 0 ? 'STORE' : 'SELL NOW';
+  const riskLevel = Math.abs(priceChange) < 0.03 ? 'Low' : Math.abs(priceChange) < 0.05 ? 'Medium' : 'High';
+
+  document.getElementById('storage-result').innerHTML = `
+    <div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:.75rem;text-transform:uppercase;font-weight:700;color:var(--muted);letter-spacing:.08em">AI Recommendation</div>
+        <div style="font-size:2rem;font-weight:800;color:${recommend==='STORE'?'var(--green)':'var(--red)'};margin:6px 0">${recommend}</div>
+        ${recommend==='STORE'?`<span class="badge badge-store">STORE FOR ${days} DAYS</span>`:`<span class="badge badge-sell">SELL IMMEDIATELY</span>`}
+      </div>
+      <div class="ai-card" style="margin-bottom:14px">
+        <div class="ai-card-header"><span class="ai-icon">🤖</span><span>AI Analysis</span></div>
+        <div class="ai-card-body">
+          ${isCotton ? `Market prices are expected to rise by <strong>4.1%</strong>. After considering storage costs of ₹${storageCost.toLocaleString('en-IN')}, your estimated additional profit is <strong style="color:var(--green)">₹${Math.round(netGain).toLocaleString('en-IN')}</strong>.`
+          : `Groundnut prices are expected to fall by 2.2%. Selling today at ₹${price}/q maximizes your returns. Storing would reduce profits by <strong style="color:var(--red)">₹${Math.round(Math.abs(netGain)).toLocaleString('en-IN')}</strong>.`}
+        </div>
+      </div>
+      <div class="card-grid grid-2" style="gap:8px">
+        <div style="padding:10px;background:var(--green-pale);border-radius:8px;text-align:center">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase">Current Profit</div>
+          <div style="font-size:1.2rem;font-weight:800;color:var(--green)">₹${currentProfit.toLocaleString('en-IN')}</div>
+        </div>
+        <div style="padding:10px;background:${netGain>0?'#e8f5e9':'#ffebee'};border-radius:8px;text-align:center">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase">Expected After Store</div>
+          <div style="font-size:1.2rem;font-weight:800;color:${netGain>0?'var(--green)':'var(--red)'}">₹${Math.round(futureProfit).toLocaleString('en-IN')}</div>
+        </div>
+        <div style="padding:10px;background:var(--yellow-pale);border-radius:8px;text-align:center">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase">Storage Cost</div>
+          <div style="font-size:1.2rem;font-weight:800;color:var(--orange)">₹${storageCost.toLocaleString('en-IN')}</div>
+        </div>
+        <div style="padding:10px;background:#e3f2fd;border-radius:8px;text-align:center">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase">Risk Level</div>
+          <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">${riskLevel}</div>
+        </div>
+      </div>
+    </div>`;
+
+  // Update storage chart
+  if(chartsInit['storageChart']) { chartsInit['storageChart'].destroy(); }
+  const ctx = document.getElementById('storageChart').getContext('2d');
+  const labels = Array.from({length:days+1},(_,i)=>`Day ${i}`);
+  const profitData = labels.map((_,i) => Math.round(qty * (price * (1 + priceChange * i/days)) - qty * i * cost));
+  chartsInit['storageChart'] = new Chart(ctx, {
+    type:'line',
+    data:{labels,datasets:[{label:'Expected Profit (₹)',data:profitData,borderColor:netGain>0?'#4caf50':'#e53935',backgroundColor:netGain>0?'rgba(76,175,80,.1)':'rgba(229,57,53,.1)',fill:true,tension:.4,pointRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')}}}}
+  });
+}
+
+// ============ QUALITY GRADING ============
+function handleImageUpload(input) {
+  if(input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('preview-img').src = e.target.result;
+      document.getElementById('uploaded-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function runQualityGrade() {
+  const crop = document.getElementById('qg-crop').value;
+  const isCotton = crop === 'Cotton';
+  const result = document.getElementById('quality-result');
+  result.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted)"><div class="spinner" style="width:32px;height:32px;margin:0 auto 12px"></div><p>Analyzing crop quality...</p></div>`;
+  setTimeout(() => {
+    const grade = isCotton ? 'A' : 'B+';
+    const score = isCotton ? 88 : 76;
+    const moisture = parseFloat(document.getElementById('qg-moisture').value) || 8;
+    const params = isCotton
+      ? [{name:'Moisture Level',val:moisture <= 8 ? 92 : 70,label:moisture+'%'},{name:'Colour Quality',val:90,label:'White/Creamy'},{name:'Impurity Level',val:85,label:'Very Low'},{name:'Fibre Quality',val:88,label:'Long Staple'}]
+      : [{name:'Moisture Level',val:moisture <= 8 ? 88 : 65,label:moisture+'%'},{name:'Shell Quality',val:80,label:'Good'},{name:'Oil Content',val:82,label:'48%'},{name:'Size Uniformity',val:75,label:'Medium'}];
+    const marketVal = isCotton ? 7250 + (score-80)*20 : 6800 + (score-70)*15;
+    const recPrice = Math.round(marketVal * 1.03);
+
+    result.innerHTML = `
+      <div>
+        <div style="text-align:center;margin-bottom:16px">
+          <div style="font-size:.78rem;text-transform:uppercase;color:var(--muted);font-weight:700">Quality Grade</div>
+          <div style="font-size:2.5rem;font-weight:800;color:var(--green)">${crop} Grade ${grade}</div>
+          <div style="font-size:.88rem;color:var(--muted)">Quality Score: <strong style="font-size:1.2rem;color:var(--text)">${score}/100</strong></div>
+          <div style="margin:10px auto;width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--green-light) ${score*3.6}deg, #e0e0e0 0deg);display:flex;align-items:center;justify-content:center">
+            <div style="width:90px;height:90px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:var(--green)">${score}</div>
+          </div>
+        </div>
+        <h4 style="font-size:.85rem;margin-bottom:10px;color:var(--muted)">QUALITY PARAMETERS</h4>
+        ${params.map(p => `
+          <div class="quality-param">
+            <span>${p.name}</span>
+            <div class="progress-bar"><div class="progress-fill" style="width:${p.val}%;background:${p.val>=85?'var(--green-light)':p.val>=70?'var(--yellow)':'var(--orange)'}"></div></div>
+            <strong>${p.label}</strong>
+          </div>`).join('')}
+        <div class="ai-card" style="margin-top:14px">
+          <div class="ai-card-header"><span class="ai-icon">🤖</span><span>AI Pricing Recommendation</span></div>
+          <div class="ai-card-body">
+            Estimated Market Value: <strong>₹${marketVal.toLocaleString('en-IN')}/quintal</strong><br/>
+            Recommended Selling Price: <strong style="color:var(--green)">₹${recPrice.toLocaleString('en-IN')}/quintal</strong><br/>
+            <span style="font-size:.8rem;color:var(--muted)">Grade ${grade} commands a premium of 3–5% over base market price.</span>
+          </div>
+        </div>
+      </div>`;
+  }, 1800);
+}
+
+// ============ TRANSACTIONS ============
+function renderTransactions(data) {
+  document.getElementById('txn-tbody').innerHTML = data.map(t => `
+    <tr>
+      <td>${new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>${t.crop === 'Cotton' ? '🌿' : '🥜'} ${t.crop}</td>
+      <td>${t.qty} Q</td>
+      <td>${t.buyer}</td>
+      <td>₹${t.rate.toLocaleString('en-IN')}/q</td>
+      <td><strong>₹${t.amount.toLocaleString('en-IN')}</strong></td>
+      <td><span class="badge ${t.status==='paid'?'badge-green':'badge-orange'}">${t.status==='paid'?'✓ Paid':'⏳ Pending'}</span></td>
+    </tr>`).join('');
+}
+function filterTransactions() {
+  let d = [...transactions];
+  const crop = document.getElementById('txn-crop-filter').value;
+  const status = document.getElementById('txn-status-filter').value;
+  if(crop !== 'all') d = d.filter(t => t.crop.toLowerCase() === crop);
+  if(status !== 'all') d = d.filter(t => t.status === status);
+  renderTransactions(d);
+}
+
+// ============ MANDI MAP ============
+const mandiPositions = [
+  {name:'Gondal',    x:22, y:58, demand:'high'},
+  {name:'Rajkot',   x:30, y:42, demand:'high'},
+  {name:'Junagadh', x:18, y:75, demand:'medium'},
+  {name:'Amreli',   x:38, y:72, demand:'high'},
+  {name:'Ahmedabad',x:62, y:20, demand:'medium'},
+  {name:'Bhavnagar',x:50, y:58, demand:'medium'},
+  {name:'Surendranagar',x:48,y:35,demand:'medium'},
+  {name:'Morbi',    x:34, y:22, demand:'low'},
+  {name:'Botad',    x:44, y:50, demand:'high'},
+];
+const demandEmoji = {high:'🟢',medium:'🟡',low:'🔴'};
+
+function renderMandiMap() {
+  const map = document.getElementById('gujarat-map');
+  map.innerHTML = mandiPositions.map(m => {
+    const d = mandiData.find(x => x.name === m.name) || {};
+    return `<div class="mandi-pin" style="left:${m.x}%;top:${m.y}%" onclick="showMandiInfo('${m.name}')">
+      <span class="pin-icon">${demandEmoji[m.demand]}📍</span>
+      <div class="pin-label">${m.name}</div>
+    </div>`;
+  }).join('');
+}
+
+function showMandiInfo(name) {
+  const d = mandiData.find(x => x.name === name);
+  if(!d) return;
+  showToast(`📍 ${d.name}: Cotton ₹${d.cotton}/q · Groundnut ₹${d.groundnut}/q · ${d.arrivals} Arrivals`);
+}
+
+function renderMandiCards(data) {
+  document.getElementById('mandi-cards-grid').className = 'card-grid grid-3';
+  document.getElementById('mandi-cards-grid').innerHTML = data.map(m => `
+    <div class="card" style="padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+        <div><strong style="font-size:.95rem">${m.name}</strong><div style="font-size:.75rem;color:var(--muted)">${m.district} District</div></div>
+        <span>${demandEmoji[m.demand]}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:6px">
+        <span>🌿 Cotton</span><strong style="color:var(--green)">₹${m.cotton.toLocaleString('en-IN')}/q</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:8px">
+        <span>🥜 Groundnut</span><strong style="color:var(--brown)">₹${m.groundnut.toLocaleString('en-IN')}/q</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)">
+        <span>Arrivals: ${m.arrivals}</span><span style="color:${m.trend==='↑'?'var(--green)':'var(--red)'}">Trend: ${m.trend}</span>
+      </div>
+    </div>`).join('');
+}
+
+function filterMap(type) {
+  document.querySelectorAll('[id^="map-btn"]').forEach(b => b.classList.remove('btn-primary'));
+  document.getElementById('map-btn-' + type).classList.add('btn-primary');
+  let d = [...mandiData];
+  if(type === 'highest') d = [...mandiData].sort((a,b) => b.cotton - a.cotton).slice(0,5);
+  renderMandiCards(d);
+}
+
+// ============ FORECAST ============
+const forecastData = {
+  cotton:    {current:7250, yesterday:7130, weekly:'+3.4%', monthly:'+7.1%', predicted:7550, confidence:84, rec:'Cotton prices are expected to increase by approximately <strong>4.1%</strong> in the next 5 days. Consider storing your crop if storage facilities are available. Upward trend driven by lower arrivals and strong export demand.', action:'store'},
+  groundnut: {current:6800, yesterday:6850, weekly:'-0.7%', monthly:'+2.1%', predicted:6650, confidence:79, rec:'Groundnut prices are showing a slight downward trend of <strong>2.2%</strong> over the next 5 days due to higher mandi arrivals. Selling now is recommended to maximize returns.', action:'sell'},
+};
+
+function updateForecast() {
+  const crop = document.getElementById('fc-crop').value;
+  const d = forecastData[crop];
+  document.getElementById('fc-current').textContent = '₹' + d.current.toLocaleString('en-IN');
+  document.getElementById('fc-yesterday').textContent = '₹' + d.yesterday.toLocaleString('en-IN');
+  document.getElementById('fc-weekly').textContent = (d.weekly.startsWith('+') ? '↑ ' : '↓ ') + d.weekly;
+  document.getElementById('fc-monthly').textContent = (d.monthly.startsWith('+') ? '↑ ' : '↓ ') + d.monthly;
+  document.getElementById('fc-predicted').textContent = '₹' + d.predicted.toLocaleString('en-IN');
+  document.getElementById('fc-confidence-bar').style.width = d.confidence + '%';
+  document.getElementById('fc-confidence-txt').textContent = d.confidence + '% Confidence';
+  document.getElementById('fc-recommendation').innerHTML = d.rec;
+  document.getElementById('fc-action-badge').innerHTML = `<span class="badge badge-${d.action==='store'?'store':d.action==='hold'?'hold':'sell'}">${d.action.toUpperCase()}</span>`;
+  updateForecastChart();
+}
+
+function runForecast() {
+  const btn = event.target;
+  btn.textContent = '⏳ Analyzing...';
+  btn.disabled = true;
+  setTimeout(() => { btn.textContent = '🔮 Run AI Forecast'; btn.disabled = false; updateForecastChart(); showToast('✅ AI forecast updated with latest market data!'); }, 1500);
+}
+
+function selectAction(act) {
+  ['sell','hold','store'].forEach(a => {
+    const el = document.getElementById('action-' + a);
+    if(el) el.style.border = 'none';
+  });
+  const el = document.getElementById('action-' + act);
+  if(el) el.style.border = '2px solid var(--green)';
+  showToast(`✅ Action recorded: ${act.toUpperCase()}. We'll remind you when optimal timing approaches.`);
+}
+
+// ============ CHATBOT ============
+let chatOpen = false;
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-window').classList.toggle('open', chatOpen);
+}
+function quickChat(msg) { document.getElementById('chat-input').value = msg; sendChat(); }
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  addMsg(msg, 'user');
+  inp.value = '';
+  setTimeout(() => addMsg(getBotResponse(msg), 'bot'), 700);
+}
+function addMsg(text, type) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + type;
+  div.innerHTML = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function getBotResponse(msg) {
+  const m = msg.toLowerCase();
+  if(m.includes('cotton') && (m.includes('price') || m.includes('today'))) return '🌿 <strong>Today\'s Cotton Price:</strong> ₹7,250/quintal at Rajkot. Best price is ₹7,380/quintal at Gondal mandi (12 km away). Trend: ↑ Increasing.';
+  if(m.includes('groundnut') && (m.includes('price') || m.includes('today'))) return '🥜 <strong>Today\'s Groundnut Price:</strong> ₹6,800/quintal at Rajkot. Best at Amreli: ₹6,950/quintal. Trend: ↓ Slight dip expected.';
+  if(m.includes('sell') && m.includes('groundnut')) return '🤖 <strong>AI Advice:</strong> Selling groundnut today is recommended. Prices are expected to fall 2.2% in the next week. Current rate ₹6,800/q is near a local peak.';
+  if(m.includes('sell') && m.includes('cotton')) return '🤖 <strong>AI Advice:</strong> Holding cotton for 5–7 days is recommended. Prices are predicted to rise 4.1% to ₹7,550/q. Storing could earn ₹3,400 extra on 10 quintals.';
+  if(m.includes('mandi') || m.includes('market') || m.includes('highest price')) return '🏆 <strong>Highest Price Mandis Today:</strong><br/>Cotton: Gondal ₹7,380/q<br/>Groundnut: Amreli ₹6,950/q<br/>Bhavnagar: ₹6,830/q';
+  if(m.includes('forecast') || m.includes('next week') || m.includes('future')) return '🔮 <strong>7-Day Forecast:</strong><br/>Cotton: ₹7,250 → <strong>₹7,550</strong> (+4.1%) ↑<br/>Groundnut: ₹6,800 → <strong>₹6,650</strong> (-2.2%) ↓<br/>Confidence: 84%';
+  if(m.includes('buyer') || m.includes('contact')) return '🤝 <strong>Top Buyer Match:</strong> Patel Agro Traders, Gondal — offering ₹7,400/q for 200 quintals of cotton. <strong>92% AI match score!</strong> Go to Find Buyers to contact them.';
+  if(m.includes('storage') || m.includes('store')) return '🏪 <strong>Storage Advice:</strong> For cotton at ₹7,250/q — storing 7 days at ₹8/q/day costs ₹56/q but could earn extra ₹300/q (price rise). Net gain on 50q: ~₹12,200.';
+  if(m.includes('quality') || m.includes('grade')) return '⭐ <strong>Quality Grading:</strong> Go to Quality Grading section and upload a crop image. AI will grade your cotton or groundnut with quality parameters and suggest optimal selling price.';
+  if(m.includes('hello') || m.includes('hi') || m.includes('namaste')) return '👋 Namaste! I\'m here to help you with cotton and groundnut market intelligence. Ask me about prices, buyers, storage advice, or market forecasts!';
+  return '🤖 I can help with: <strong>cotton prices, groundnut prices, best mandis, price forecasts, buyer matching, storage advice, and quality grading.</strong> What would you like to know?';
+}
+
+// ============ CHART INIT ============
+function initPageCharts(page) {
+  if(page === 'home') initHomeCharts();
+  else if(page === 'dashboard') initDashCharts();
+  else if(page === 'market') initMarketCharts();
+  else if(page === 'forecast') initForecastChart();
+  else if(page === 'income') initIncomeCharts();
+}
+
+const days7 = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function initHomeCharts() {
+  if(chartsInit['homeSnapshotChart']) return;
+  const ctx = document.getElementById('homeSnapshotChart').getContext('2d');
+  chartsInit['homeSnapshotChart'] = new Chart(ctx, {
+    type:'line',
+    data:{labels:days7,datasets:[
+      {label:'Cotton',data:[7100,7150,7080,7200,7180,7250,7250],borderColor:'#2d7a2d',backgroundColor:'rgba(45,122,45,.1)',fill:true,tension:.4},
+      {label:'Groundnut',data:[6900,6850,6870,6820,6800,6750,6800],borderColor:'#8d6e63',backgroundColor:'rgba(141,110,99,.08)',fill:true,tension:.4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'₹'+v}}}}
+  });
+}
+
+let dashTrendChart, dashForecastChart, mandiCompareChart;
+
+function initDashCharts() {
+  if(chartsInit['dashTrendChart']) return;
+  const c1 = document.getElementById('dashTrendChart').getContext('2d');
+  chartsInit['dashTrendChart'] = new Chart(c1, {
+    type:'line',
+    data:{labels:days7,datasets:[{label:'Cotton (₹/q)',data:[7100,7150,7080,7200,7180,7130,7250],borderColor:'#2d7a2d',backgroundColor:'rgba(45,122,45,.12)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#2d7a2d'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v}}}}
+  });
+  const c2 = document.getElementById('mandiCompareChart').getContext('2d');
+  chartsInit['mandiCompareChart'] = new Chart(c2, {
+    type:'bar',
+    data:{
+      labels:['Gondal','Rajkot','Ahmedabad','Botad','Amreli','Bhavnagar'],
+      datasets:[
+        {label:'Cotton',data:[7380,7250,7320,7310,7160,7140],backgroundColor:'rgba(45,122,45,.75)',borderRadius:6},
+        {label:'Groundnut',data:[6920,6800,6780,6900,6950,6830],backgroundColor:'rgba(109,76,65,.65)',borderRadius:6}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'₹'+v}}}}
+  });
+  const c3 = document.getElementById('dashForecastChart').getContext('2d');
+  const futureDays = ['Today','+1d','+2d','+3d','+4d','+5d','+6d','+7d'];
+  chartsInit['dashForecastChart'] = new Chart(c3, {
+    type:'line',
+    data:{labels:futureDays,datasets:[
+      {label:'Cotton Forecast',data:[7250,7290,7340,7380,7420,7470,7510,7550],borderColor:'#2d7a2d',backgroundColor:'rgba(45,122,45,.1)',fill:true,tension:.4,borderDash:[5,5]},
+      {label:'Groundnut Forecast',data:[6800,6780,6760,6740,6720,6700,6680,6650],borderColor:'#8d6e63',backgroundColor:'rgba(141,110,99,.08)',fill:true,tension:.4,borderDash:[5,5]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'₹'+v}}}}
+  });
+}
+
+function updateDashboardTrend(crop) {
+  if(!chartsInit['dashTrendChart']) return;
+  const isCotton = crop === 'cotton';
+  chartsInit['dashTrendChart'].data.datasets[0].label = isCotton ? 'Cotton (₹/q)' : 'Groundnut (₹/q)';
+  chartsInit['dashTrendChart'].data.datasets[0].data = isCotton
+    ? [7100,7150,7080,7200,7180,7130,7250]
+    : [6900,6850,6870,6820,6800,6750,6800];
+  chartsInit['dashTrendChart'].data.datasets[0].borderColor = isCotton ? '#2d7a2d' : '#8d6e63';
+  chartsInit['dashTrendChart'].data.datasets[0].backgroundColor = isCotton ? 'rgba(45,122,45,.12)' : 'rgba(141,110,99,.12)';
+  chartsInit['dashTrendChart'].update();
+}
+
+function initMarketCharts() {
+  if(chartsInit['topCottonChart']) return;
+  const sorted = [...mandiData].sort((a,b)=>b.cotton-a.cotton).slice(0,6);
+  const c1 = document.getElementById('topCottonChart').getContext('2d');
+  chartsInit['topCottonChart'] = new Chart(c1,{type:'bar',data:{labels:sorted.map(m=>m.name),datasets:[{label:'Cotton ₹/q',data:sorted.map(m=>m.cotton),backgroundColor:'rgba(45,122,45,.75)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:7000,ticks:{callback:v=>'₹'+v}}}}});
+  const sorted2 = [...mandiData].sort((a,b)=>b.groundnut-a.groundnut).slice(0,6);
+  const c2 = document.getElementById('topGroundnutChart').getContext('2d');
+  chartsInit['topGroundnutChart'] = new Chart(c2,{type:'bar',data:{labels:sorted2.map(m=>m.name),datasets:[{label:'Groundnut ₹/q',data:sorted2.map(m=>m.groundnut),backgroundColor:'rgba(109,76,65,.75)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:6600,ticks:{callback:v=>'₹'+v}}}}});
+}
+
+function initForecastChart() { updateForecastChart(); }
+
+function updateForecastChart() {
+  const crop = document.getElementById('fc-crop') ? document.getElementById('fc-crop').value : 'cotton';
+  const isCotton = crop === 'cotton';
+  const historical = isCotton ? [7100,7150,7080,7200,7180,7130,7250] : [6900,6850,6870,6820,6800,6750,6800];
+  const predicted = isCotton ? [7250,7290,7340,7380,7420,7470,7510,7550] : [6800,6780,6760,6740,6720,6700,6680,6650];
+  const allLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Today','+1d','+2d','+3d','+4d','+5d','+6d','+7d'];
+  if(chartsInit['forecastChart']) chartsInit['forecastChart'].destroy();
+  const ctx = document.getElementById('forecastChart');
+  if(!ctx) return;
+  chartsInit['forecastChart'] = new Chart(ctx.getContext('2d'), {
+    type:'line',
+    data:{labels:allLabels,datasets:[
+      {label:'Historical',data:[...historical,...Array(8).fill(null)],borderColor:isCotton?'#2d7a2d':'#6d4c41',backgroundColor:'transparent',tension:.4,pointRadius:4},
+      {label:'AI Forecast',data:[...Array(7).fill(null),...predicted],borderColor:'#7b1fa2',backgroundColor:'rgba(123,31,162,.08)',fill:true,tension:.4,borderDash:[6,4],pointRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>v?'₹'+v:''}}}}
+  });
+}
+
+function initIncomeCharts() {
+  if(chartsInit['monthlyIncomeChart']) return;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const ctx1 = document.getElementById('monthlyIncomeChart').getContext('2d');
+  chartsInit['monthlyIncomeChart'] = new Chart(ctx1,{
+    type:'bar',
+    data:{labels:months,datasets:[
+      {label:'Cotton Income',data:[52000,48000,61000,55000,70000,63000,74000,68000,82000,75000,145000,0],backgroundColor:'rgba(45,122,45,.75)',borderRadius:6},
+      {label:'Groundnut Income',data:[30000,28000,35000,32000,40000,37000,42000,39000,48000,43000,0,102000],backgroundColor:'rgba(109,76,65,.65)',borderRadius:6}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'₹'+Math.round(v/1000)+'K'}}}}
+  });
+  const ctx2 = document.getElementById('cropIncomeChart').getContext('2d');
+  chartsInit['cropIncomeChart'] = new Chart(ctx2,{
+    type:'doughnut',
+    data:{labels:['Cotton','Groundnut'],datasets:[{data:[540000,300000],backgroundColor:['#2d7a2d','#8d6e63'],borderWidth:0,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}
+  });
+}
+
+function updateIncomeCharts(year) { /* data would refresh here */ }
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+  renderMarketTable(mandiData);
+  renderBuyers(buyers.sort((a,b) => b.match - a.match));
+  renderTransactions(transactions);
+  renderMandiMap();
+  renderMandiCards(mandiData);
+  initHomeCharts();
+  // Set default date for quality grading
+  document.getElementById('qg-date').value = new Date().toISOString().split('T')[0];
+  // Close sidebar overlay on mobile click
+  document.addEventListener('click', e => {
+    const sb = document.getElementById('sidebar');
+    if(window.innerWidth < 900 && sb.classList.contains('open') && !sb.contains(e.target) && !e.target.classList.contains('menu-btn')) {
+      sb.classList.remove('open');
+    }
+  });
+});
+</script>
+</body>
+</html>
