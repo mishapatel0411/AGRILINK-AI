@@ -1,0 +1,710 @@
+{
+  "project": {
+    "name": "AgriLink AI",
+    "subtitle": "Cotton & Groundnut Market Intelligence Platform",
+    "version": "1.0.0",
+    "description": "AI-powered agricultural market intelligence platform for Gujarat farmers growing cotton and groundnut.",
+    "targetRegion": "Gujarat, India",
+    "primaryCrops": ["Cotton", "Groundnut"],
+    "farmerProfile": {
+      "name": "Ramesh Patel",
+      "location": "Rajkot, Gujarat",
+      "crops": ["Cotton", "Groundnut"],
+      "landArea": 12,
+      "landUnit": "acres",
+      "mobile": "+91 98765 43210"
+    }
+  },
+
+  "mandis": [
+    {
+      "name": "Gondal",
+      "district": "Rajkot",
+      "prices": {
+        "cotton": 7380,
+        "groundnut": 6920,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "High",
+      "trend": "up",
+      "demand": "high",
+      "coordinates": {
+        "lat": 22.0,
+        "lng": 70.8
+      },
+      "distanceFromRajkot_km": 12
+    },
+    {
+      "name": "Rajkot",
+      "district": "Rajkot",
+      "prices": {
+        "cotton": 7250,
+        "groundnut": 6800,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "Medium",
+      "trend": "up",
+      "demand": "high",
+      "coordinates": {
+        "lat": 22.3,
+        "lng": 70.8
+      },
+      "distanceFromRajkot_km": 0
+    },
+    {
+      "name": "Junagadh",
+      "district": "Junagadh",
+      "prices": {
+        "cotton": 7190,
+        "groundnut": 6870,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "Medium",
+      "trend": "stable",
+      "demand": "medium",
+      "coordinates": {
+        "lat": 21.5,
+        "lng": 70.5
+      },
+      "distanceFromRajkot_km": 98
+    },
+    {
+      "name": "Amreli",
+      "district": "Amreli",
+      "prices": {
+        "cotton": 7160,
+        "groundnut": 6950,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "Low",
+      "trend": "up",
+      "demand": "high",
+      "coordinates": {
+        "lat": 21.6,
+        "lng": 71.2
+      },
+      "distanceFromRajkot_km": 110
+    },
+    {
+      "name": "Ahmedabad",
+      "district": "Ahmedabad",
+      "prices": {
+        "cotton": 7320,
+        "groundnut": 6780,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "High",
+      "trend": "up",
+      "demand": "medium",
+      "coordinates": {
+        "lat": 23.0,
+        "lng": 72.6
+      },
+      "distanceFromRajkot_km": 215
+    },
+    {
+      "name": "Bhavnagar",
+      "district": "Bhavnagar",
+      "prices": {
+        "cotton": 7140,
+        "groundnut": 6830,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "Medium",
+      "trend": "down",
+      "demand": "medium",
+      "coordinates": {
+        "lat": 21.8,
+        "lng": 72.2
+      },
+      "distanceFromRajkot_km": 165
+    },
+    {
+      "name": "Surendranagar",
+      "district": "Surendranagar",
+      "prices": {
+        "cotton": 7200,
+        "groundnut": 6760,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "High",
+      "trend": "up",
+      "demand": "medium",
+      "coordinates": {
+        "lat": 22.7,
+        "lng": 71.6
+      },
+      "distanceFromRajkot_km": 112
+    },
+    {
+      "name": "Morbi",
+      "district": "Morbi",
+      "prices": {
+        "cotton": 7280,
+        "groundnut": 6840,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "Low",
+      "trend": "stable",
+      "demand": "low",
+      "coordinates": {
+        "lat": 22.8,
+        "lng": 70.8
+      },
+      "distanceFromRajkot_km": 60
+    },
+    {
+      "name": "Botad",
+      "district": "Botad",
+      "prices": {
+        "cotton": 7310,
+        "groundnut": 6900,
+        "unit": "₹/quintal"
+      },
+      "arrivals": "Medium",
+      "trend": "up",
+      "demand": "high",
+      "coordinates": {
+        "lat": 22.2,
+        "lng": 71.7
+      },
+      "distanceFromRajkot_km": 85
+    }
+  ],
+
+  "buyers": [
+    {
+      "id": 1,
+      "name": "Patel Agro Traders",
+      "type": "Trader",
+      "location": "Gondal",
+      "district": "Rajkot",
+      "distanceFromFarmer_km": 12,
+      "crop": "cotton",
+      "quantityRequired_quintal": 200,
+      "offeredPrice": 7400,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "A",
+      "aiMatchScore": 92,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "high",
+        "distance": "very_close",
+        "quantityAvailability": "compatible",
+        "cropQuality": "grade_A"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Gujarat Cotton Corp",
+      "type": "Corporation",
+      "location": "Ahmedabad",
+      "district": "Ahmedabad",
+      "distanceFromFarmer_km": 85,
+      "crop": "cotton",
+      "quantityRequired_quintal": 500,
+      "offeredPrice": 7200,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "A/B",
+      "aiMatchScore": 78,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "moderate",
+        "distance": "far",
+        "quantityAvailability": "high_demand",
+        "cropQuality": "grade_A_or_B"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Saurashtra Seeds Co.",
+      "type": "Seed Company",
+      "location": "Rajkot",
+      "district": "Rajkot",
+      "distanceFromFarmer_km": 5,
+      "crop": "groundnut",
+      "quantityRequired_quintal": 100,
+      "offeredPrice": 6900,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "A",
+      "aiMatchScore": 88,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "high",
+        "distance": "very_close",
+        "quantityAvailability": "compatible",
+        "cropQuality": "grade_A"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Kisan Agro Hub",
+      "type": "Agro Hub",
+      "location": "Junagadh",
+      "district": "Junagadh",
+      "distanceFromFarmer_km": 60,
+      "crop": "groundnut",
+      "quantityRequired_quintal": 80,
+      "offeredPrice": 6950,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "A",
+      "aiMatchScore": 85,
+      "isVerified": false,
+      "matchFactors": {
+        "priceCompatibility": "high",
+        "distance": "moderate",
+        "quantityAvailability": "compatible",
+        "cropQuality": "grade_A"
+      }
+    },
+    {
+      "id": 5,
+      "name": "Modi Traders",
+      "type": "Trader",
+      "location": "Amreli",
+      "district": "Amreli",
+      "distanceFromFarmer_km": 45,
+      "crop": "cotton",
+      "quantityRequired_quintal": 150,
+      "offeredPrice": 7350,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "B",
+      "aiMatchScore": 81,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "high",
+        "distance": "moderate",
+        "quantityAvailability": "compatible",
+        "cropQuality": "grade_B"
+      }
+    },
+    {
+      "id": 6,
+      "name": "Sunrise Exports",
+      "type": "Exporter",
+      "location": "Bhavnagar",
+      "district": "Bhavnagar",
+      "distanceFromFarmer_km": 95,
+      "crop": "cotton",
+      "quantityRequired_quintal": 1000,
+      "offeredPrice": 7180,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "A",
+      "aiMatchScore": 70,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "moderate",
+        "distance": "far",
+        "quantityAvailability": "large_volume",
+        "cropQuality": "grade_A"
+      }
+    },
+    {
+      "id": 7,
+      "name": "Reliable Agro Pvt Ltd",
+      "type": "Private Company",
+      "location": "Botad",
+      "district": "Botad",
+      "distanceFromFarmer_km": 55,
+      "crop": "groundnut",
+      "quantityRequired_quintal": 200,
+      "offeredPrice": 6850,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "B",
+      "aiMatchScore": 74,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "moderate",
+        "distance": "moderate",
+        "quantityAvailability": "compatible",
+        "cropQuality": "grade_B"
+      }
+    },
+    {
+      "id": 8,
+      "name": "Farmer Direct Network",
+      "type": "FPO Network",
+      "location": "Gondal",
+      "district": "Rajkot",
+      "distanceFromFarmer_km": 12,
+      "crop": "both",
+      "quantityRequired_quintal": 300,
+      "offeredPrice": 7300,
+      "offeredPriceUnit": "₹/quintal",
+      "preferredGrade": "A",
+      "aiMatchScore": 90,
+      "isVerified": true,
+      "matchFactors": {
+        "priceCompatibility": "high",
+        "distance": "very_close",
+        "quantityAvailability": "compatible",
+        "cropQuality": "grade_A"
+      }
+    }
+  ],
+
+  "farmerListings": [
+    {
+      "id": 1,
+      "crop": "Cotton",
+      "quantity_quintal": 50,
+      "grade": "A",
+      "expectedPrice": 7300,
+      "expectedPriceUnit": "₹/quintal",
+      "location": "Rajkot",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "crop": "Groundnut",
+      "quantity_quintal": 30,
+      "grade": "B",
+      "expectedPrice": 6700,
+      "expectedPriceUnit": "₹/quintal",
+      "location": "Rajkot",
+      "status": "active"
+    }
+  ],
+
+  "receivedOffers": [
+    {
+      "id": 1,
+      "buyer": "Patel Agro Traders",
+      "location": "Gondal",
+      "isVerified": true,
+      "crop": "Cotton",
+      "quantity_quintal": 50,
+      "offeredPrice": 7400,
+      "offeredPriceUnit": "₹/quintal",
+      "totalAmount": 370000,
+      "status": "pending_acceptance"
+    },
+    {
+      "id": 2,
+      "buyer": "Gujarat Cotton Corp",
+      "location": "Ahmedabad",
+      "isVerified": true,
+      "crop": "Cotton",
+      "quantity_quintal": 30,
+      "offeredPrice": 7200,
+      "offeredPriceUnit": "₹/quintal",
+      "totalAmount": 216000,
+      "status": "pending_acceptance"
+    }
+  ],
+
+  "transactions": [
+    {
+      "id": 1,
+      "date": "2024-11-15",
+      "crop": "Cotton",
+      "quantity_quintal": 20,
+      "buyer": "Patel Agro Traders",
+      "rate": 7250,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 145000,
+      "status": "paid"
+    },
+    {
+      "id": 2,
+      "date": "2024-11-02",
+      "crop": "Groundnut",
+      "quantity_quintal": 15,
+      "buyer": "Saurashtra Seeds Co.",
+      "rate": 6800,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 102000,
+      "status": "paid"
+    },
+    {
+      "id": 3,
+      "date": "2024-10-18",
+      "crop": "Cotton",
+      "quantity_quintal": 25,
+      "buyer": "Gujarat Cotton Corp",
+      "rate": 7100,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 177500,
+      "status": "paid"
+    },
+    {
+      "id": 4,
+      "date": "2024-10-05",
+      "crop": "Groundnut",
+      "quantity_quintal": 20,
+      "buyer": "Kisan Agro Hub",
+      "rate": 6750,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 135000,
+      "status": "paid"
+    },
+    {
+      "id": 5,
+      "date": "2024-09-22",
+      "crop": "Cotton",
+      "quantity_quintal": 10,
+      "buyer": "Modi Traders",
+      "rate": 6950,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 69500,
+      "status": "paid"
+    },
+    {
+      "id": 6,
+      "date": "2024-12-01",
+      "crop": "Cotton",
+      "quantity_quintal": 30,
+      "buyer": "Patel Agro Traders",
+      "rate": 7400,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 222000,
+      "status": "pending"
+    },
+    {
+      "id": 7,
+      "date": "2024-12-05",
+      "crop": "Groundnut",
+      "quantity_quintal": 10,
+      "buyer": "Farmer Direct Network",
+      "rate": 6900,
+      "rateUnit": "₹/quintal",
+      "totalAmount": 69000,
+      "status": "pending"
+    }
+  ],
+
+  "priceForecast": {
+    "cotton": {
+      "currentPrice": 7250,
+      "yesterdayPrice": 7130,
+      "weeklyTrendPercent": 3.4,
+      "monthlyTrendPercent": 7.1,
+      "predictedPrice_7days": 7550,
+      "predictedChangePercent": 4.1,
+      "aiConfidencePercent": 84,
+      "recommendation": "STORE",
+      "recommendationReason": "Cotton prices are expected to increase by approximately 4.1% in the next 5 days. Consider storing your crop if storage facilities are available. The upward trend is driven by lower arrivals at major Gujarat mandis and strong export demand.",
+      "historicalPrices_7days": [7100, 7150, 7080, 7200, 7180, 7130, 7250],
+      "forecastPrices_7days":   [7250, 7290, 7340, 7380, 7420, 7470, 7510, 7550],
+      "dayLabels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    },
+    "groundnut": {
+      "currentPrice": 6800,
+      "yesterdayPrice": 6850,
+      "weeklyTrendPercent": -0.7,
+      "monthlyTrendPercent": 2.1,
+      "predictedPrice_7days": 6650,
+      "predictedChangePercent": -2.2,
+      "aiConfidencePercent": 79,
+      "recommendation": "SELL",
+      "recommendationReason": "Groundnut prices are showing a slight downward trend of 2.2% over the next 5 days due to higher mandi arrivals. Selling now is recommended to maximize returns.",
+      "historicalPrices_7days": [6900, 6850, 6870, 6820, 6800, 6750, 6800],
+      "forecastPrices_7days":   [6800, 6780, 6760, 6740, 6720, 6700, 6680, 6650],
+      "dayLabels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    }
+  },
+
+  "storageAdvisor": {
+    "defaultValues": {
+      "quantity_quintal": 50,
+      "storageCostPerQuintalPerDay": 8,
+      "storageCostUnit": "₹/quintal/day"
+    },
+    "cropFactors": {
+      "cotton": {
+        "expectedPriceChangePct": 4.1,
+        "riskLevel": "Medium",
+        "recommendedStorageDays": 7
+      },
+      "groundnut": {
+        "expectedPriceChangePct": -2.2,
+        "riskLevel": "Low",
+        "recommendedStorageDays": 0
+      }
+    }
+  },
+
+  "qualityGrading": {
+    "cotton": {
+      "gradeA": {
+        "grade": "A",
+        "qualityScore": 88,
+        "parameters": {
+          "moistureLevel_pct": 8,
+          "colourQuality": "White/Creamy",
+          "impurityLevel": "Very Low",
+          "fibreQuality": "Long Staple"
+        },
+        "parameterScores": {
+          "moistureLevel": 92,
+          "colourQuality": 90,
+          "impurityLevel": 85,
+          "fibreQuality": 88
+        },
+        "estimatedMarketValue": 7410,
+        "recommendedSellingPrice": 7632,
+        "priceUnit": "₹/quintal",
+        "premiumOverBasePercent": 3
+      }
+    },
+    "groundnut": {
+      "gradeBPlus": {
+        "grade": "B+",
+        "qualityScore": 76,
+        "parameters": {
+          "moistureLevel_pct": 8,
+          "shellQuality": "Good",
+          "oilContent_pct": 48,
+          "sizeUniformity": "Medium"
+        },
+        "parameterScores": {
+          "moistureLevel": 88,
+          "shellQuality": 80,
+          "oilContent": 82,
+          "sizeUniformity": 75
+        },
+        "estimatedMarketValue": 6890,
+        "recommendedSellingPrice": 7097,
+        "priceUnit": "₹/quintal",
+        "premiumOverBasePercent": 3
+      }
+    }
+  },
+
+  "incomeDashboard": {
+    "summary": {
+      "totalEarnings": 840000,
+      "totalEarningsFormatted": "₹8.4L",
+      "monthlyIncome": 70000,
+      "monthlyIncomeFormatted": "₹70K",
+      "totalCropSold_quintal": 120,
+      "cottonSold_quintal": 70,
+      "groundnutSold_quintal": 50,
+      "pendingPayments": 291000,
+      "pendingTransactionsCount": 2,
+      "yearOnYearGrowthPercent": 12,
+      "monthOnMonthGrowthPercent": 8,
+      "averageSellingPriceCotton": 7150,
+      "averageSellingPriceGroundnut": 6750
+    },
+    "monthlyIncome_2024": {
+      "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "cotton":    [52000, 48000, 61000, 55000, 70000, 63000, 74000, 68000, 82000,  75000, 145000,      0],
+      "groundnut": [30000, 28000, 35000, 32000, 40000, 37000, 42000, 39000, 48000,  43000,      0, 102000],
+      "unit": "₹"
+    },
+    "cropDistribution": {
+      "cotton": {
+        "amount": 540000,
+        "percent": 64.3
+      },
+      "groundnut": {
+        "amount": 300000,
+        "percent": 35.7
+      }
+    }
+  },
+
+  "marketAlerts": [
+    {
+      "id": 1,
+      "type": "price_rise",
+      "severity": "positive",
+      "title": "Cotton prices rising in Rajkot",
+      "message": "Prices up ₹120/quintal from yesterday. AI predicts further 4% rise in 5 days.",
+      "crop": "cotton"
+    },
+    {
+      "id": 2,
+      "type": "price_dip",
+      "severity": "warning",
+      "title": "Groundnut slight dip expected",
+      "message": "Prices may fall by 2.2% next week due to higher arrivals. Consider selling soon.",
+      "crop": "groundnut"
+    },
+    {
+      "id": 3,
+      "type": "new_buyers",
+      "severity": "info",
+      "title": "3 new verified buyers in Gondal",
+      "message": "New buyers looking for Grade A cotton. Best price offered: ₹7,400/quintal.",
+      "crop": "cotton"
+    }
+  ],
+
+  "aiChatResponses": [
+    {
+      "keywords": ["cotton", "price", "today"],
+      "response": "Today's Cotton Price: ₹7,250/quintal at Rajkot. Best price is ₹7,380/quintal at Gondal mandi (12 km away). Trend: Increasing."
+    },
+    {
+      "keywords": ["groundnut", "price", "today"],
+      "response": "Today's Groundnut Price: ₹6,800/quintal at Rajkot. Best at Amreli: ₹6,950/quintal. Trend: Slight dip expected."
+    },
+    {
+      "keywords": ["sell", "groundnut"],
+      "response": "AI Advice: Selling groundnut today is recommended. Prices are expected to fall 2.2% in the next week. Current rate ₹6,800/q is near a local peak."
+    },
+    {
+      "keywords": ["sell", "cotton"],
+      "response": "AI Advice: Holding cotton for 5–7 days is recommended. Prices are predicted to rise 4.1% to ₹7,550/q. Storing could earn ₹3,400 extra on 10 quintals."
+    },
+    {
+      "keywords": ["mandi", "highest", "best"],
+      "response": "Highest Price Mandis Today — Cotton: Gondal ₹7,380/q | Groundnut: Amreli ₹6,950/q | Bhavnagar: ₹6,830/q"
+    },
+    {
+      "keywords": ["forecast", "next week", "future"],
+      "response": "7-Day Forecast — Cotton: ₹7,250 → ₹7,550 (+4.1%) ↑ | Groundnut: ₹6,800 → ₹6,650 (-2.2%) ↓ | Confidence: 84%"
+    },
+    {
+      "keywords": ["buyer", "contact"],
+      "response": "Top Buyer Match: Patel Agro Traders, Gondal — offering ₹7,400/q for 200 quintals of cotton. 92% AI match score!"
+    },
+    {
+      "keywords": ["storage", "store"],
+      "response": "Storage Advice: For cotton at ₹7,250/q — storing 7 days at ₹8/q/day costs ₹56/q but could earn extra ₹300/q (price rise). Net gain on 50q: ~₹12,200."
+    }
+  ],
+
+  "navigation": [
+    { "id": "home",      "label": "Home",             "icon": "🏠" },
+    { "id": "dashboard", "label": "Dashboard",        "icon": "📊" },
+    { "id": "market",    "label": "Market Prices",    "icon": "💹" },
+    { "id": "forecast",  "label": "Price Forecast",   "icon": "🔮" },
+    { "id": "buyers",    "label": "Find Buyers",      "icon": "🤝" },
+    { "id": "storage",   "label": "Storage Advisor",  "icon": "🏪" },
+    { "id": "quality",   "label": "Quality Grading",  "icon": "⭐" },
+    { "id": "income",    "label": "Income Dashboard", "icon": "💰" },
+    { "id": "map",       "label": "Mandi Map",        "icon": "🗺️" },
+    { "id": "settings",  "label": "Settings",         "icon": "⚙️" }
+  ],
+
+  "platformStats": {
+    "farmersConnected": 2400,
+    "mandisCovered": 18,
+    "cottonPriceToday": 7250,
+    "groundnutPriceToday": 6800,
+    "priceUnit": "₹/quintal"
+  },
+
+  "notificationPreferences": {
+    "priceAlerts": true,
+    "priceAlertThresholdPercent": 3,
+    "newBuyerMatches": true,
+    "aiRecommendations": true,
+    "paymentUpdates": true
+  },
+
+  "mandiMapPins": [
+    { "name": "Gondal",         "x_pct": 22, "y_pct": 58, "demand": "high"   },
+    { "name": "Rajkot",         "x_pct": 30, "y_pct": 42, "demand": "high"   },
+    { "name": "Junagadh",       "x_pct": 18, "y_pct": 75, "demand": "medium" },
+    { "name": "Amreli",         "x_pct": 38, "y_pct": 72, "demand": "high"   },
+    { "name": "Ahmedabad",      "x_pct": 62, "y_pct": 20, "demand": "medium" },
+    { "name": "Bhavnagar",      "x_pct": 50, "y_pct": 58, "demand": "medium" },
+    { "name": "Surendranagar",  "x_pct": 48, "y_pct": 35, "demand": "medium" },
+    { "name": "Morbi",          "x_pct": 34, "y_pct": 22, "demand": "low"    },
+    { "name": "Botad",          "x_pct": 44, "y_pct": 50, "demand": "high"   }
+  ]
+}
